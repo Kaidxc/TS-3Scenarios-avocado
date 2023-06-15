@@ -10,33 +10,27 @@ import itertools
 from scipy.stats import dirichlet
 import time
 import pandas as pd
-#np.random.seed(10)
-#===Setting the true MNL model=================================================
-#------------------------------------------------------------------------------
-# Setting the true MNL model: sum(v_{i}^{1})=1
-# only the discount price combiantion related to higher purchase probailities
+
 def v_true_simulation(v_12,v_22,v_32, price_dis,b):
-    # define initial values for each product
+    
     v_1 = np.array([v_12/np.exp((1/3)*price_dis[0]*b[0]), v_12])
     v_2 = np.array([v_22/np.exp((1/3)*price_dis[1]*b[1]), v_22])
     v_3 = np.array([v_32/np.exp((1/3)*price_dis[2]*b[2]), v_32])
-    # generate all combinations
+    
     combinations = list(itertools.product(v_1, v_2, v_3))
 
-    # convert combinations to numpy array
     data = np.array(combinations)
 
     return data
 #------------------------------------------------------------------------------
 def utility_true(v_12,v_22,v_32, price_dis,b,N,K):
-    # unobserved random utility
+    
     xi = np.random.gumbel(0,1,N+1)
-    # expected utilities associated with prices
+
     v_1 = np.array([v_12/np.exp((1/3)*price_dis[0]*b[0]), v_12])
     v_2 = np.array([v_22/np.exp((1/3)*price_dis[1]*b[1]), v_22])
     v_3 = np.array([v_32/np.exp((1/3)*price_dis[2]*b[2]), v_32])
     
-    # True utilities-------------------------------
     u = xi[0]*np.ones(shape = (K**N,N+1))
     u_1 = np.log(v_1)+xi[1]
     u_2 = np.log(v_2)+xi[2]
@@ -55,8 +49,7 @@ def choice_probs_matrix(v_matrix):#(8,4)
         temp[k][1:]=v_matrix[k]/(1+np.sum(v_matrix[k]))
         temp[k][0]=1/(1+np.sum(v_matrix[k]))    
     return temp
-#------------------------------------------------------------------------------
-# Input the origianl prices for N products and related K disocunts to get price K^N combiantions
+
 class Combination():
     def __init__(self,x,y):
         self.x = x
@@ -68,9 +61,7 @@ class Combination():
             
         self.collection = np.array([cc for cc in itertools.product(*self.collection)])
         return self.collection
-#--------------------------------------------------------------------------------
-# Using enumeration method to find the optimal price combination based on the 
-# input choice probabilities matrix
+
 def optimal_row_index(probs_matrix,prices):
     #probs_matrix = choice_probs_matrix(w_matrix)   
     e_r_matrix = prices*probs_matrix[:,1:]
@@ -80,7 +71,6 @@ def optimal_row_index(probs_matrix,prices):
 def expected_revenue(price_vect, choice_probs_vect):
     return np.sum(price_vect*choice_probs_vect[1:])
 
-# update the sales data once we observe customer choice in each tome period
 def index_match(ct):
     temp_t = np.zeros(4)
     temp_t[ct]=1
@@ -170,12 +160,12 @@ data_revenue, data_regret = TS_Diri_varsInstances(T,
 #------------------------------------------------------------------------------
 #-----average revenue_t based on simulation_times = ---------------------------
 Diri_revenue_t_average = pd.DataFrame(np.mean(data_revenue, axis=1))
-D_revenue_filename = "d_revenue_t_{}_{}.csv".format(T, "_".join(map(str, np.round(b_samples,2))))
+D_revenue_filename = "d_revenue_t_{}_{}.csv".format(T, "_".join(map(str, b_samples)))
 Diri_revenue_t_average.to_csv(D_revenue_filename)
 #------------------------------------------------------------------------------
 #-----average regret_t based onb simulation_times = ---------------------------
 Diri_regret_t_average = pd.DataFrame(np.mean(data_regret, axis=1))
-D_regret_filename = "d_regret_t_{}_{}.csv".format(T, "_".join(map(str, np.round(b_samples,2))))
+D_regret_filename = "d_regret_t_{}_{}.csv".format(T, "_".join(map(str, b_samples)))
 Diri_regret_t_average.to_csv(D_regret_filename)
 #====================================================================================
 
