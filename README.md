@@ -1,1 +1,1 @@
-# TS-3Scenarios-avocado
+# Thompson sampling algorithm for Three Scenarios
