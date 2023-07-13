@@ -195,7 +195,10 @@ def TS_Beta_varsInstances(T,price_org, discounts, b_samples, simulation_times):
 start = time.time()
 
 
-T = 240*90
+T = 240
+# T = 240*7 for one week
+# T = 240*30 for one month 
+# T = 240*90 for one quarter
 b_samples = np.ones(3)
 
 
